@@ -1,0 +1,1 @@
+export const Base_URL = 'http://localhost/wp-jwt-test/wp-json'
