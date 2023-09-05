@@ -36,7 +36,7 @@ const TheatreScreen = () => {
 
     const stripe = useStripe();
     const subscribe = async () => {
-        const response = await fetch("http://192.168.1.166:8080/payment", {
+        const response = await fetch("/payment", {
             method: "POST",
             body: JSON.stringify({
                 amount: Math.floor(total * 100),
