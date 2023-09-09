@@ -1,17 +1,29 @@
 //import liraries
-import { View, Text, StyleSheet, Image, FlatList, useWindowDimensions, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, useWindowDimensions, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { addCartItem } from '../store/Cart/CartSlice';
+import { useGetProductQuery } from '../store/api/apiSlice';
 
 // create a component
-const ProductDetailsScreen = () => {
-    // const product = products[0]
+const ProductDetailsScreen = ({ route }) => {
+    const id = route.params.id
+    const { data, isLoading, error } = useGetProductQuery(id)
     const { width } = useWindowDimensions();
-    const product = useSelector((state) => state.products.selectedProduct)
+    // const product = useSelector((state) => state.products.selectedProduct)
     const dispatch = useDispatch()
     const addToCart = () => {
         dispatch(addCartItem({ product }))
     }
+    // console.log(id)
+    if (isLoading) {
+        return <ActivityIndicator />
+    }
+    if (error) {
+        return <Text>Error fetching product : {error.error}</Text>
+    }
+
+    const product = data.data
+
     return (
         <View>
             <ScrollView showsVerticalScrollIndicator={false}>
