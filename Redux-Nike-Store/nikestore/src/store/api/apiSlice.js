@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-const baseUrl = 'http://ip-address:3000/'
+const baseUrl = 'http://api-address:3000/'
 
 export const apiSlice = createApi({
     reducerPath: 'api',
@@ -12,7 +12,17 @@ export const apiSlice = createApi({
         getProduct: builder.query({
             query: (id) => `products/${id}`
         }),
+        createOrder: builder.mutation({
+            query: (newOrder) => ({
+                url: 'orders',
+                method: 'POST',
+                body: newOrder
+            })
+        }),
+        getOrder: builder.query({
+            query: (ref) => `orders/${ref}`
+        })
     }),
 });
 
-export const { useGetProductsQuery, useGetProductQuery } = apiSlice;
+export const { useGetProductsQuery, useGetProductQuery, useCreateOrderMutation, useGetOrderQuery } = apiSlice;

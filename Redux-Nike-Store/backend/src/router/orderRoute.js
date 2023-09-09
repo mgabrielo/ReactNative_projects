@@ -1,5 +1,5 @@
 const express = require('express');
-const { createOrder } = require('../db/order');
+const { createOrder, getOrder } = require('../db/order');
 const router = express.Router();
 
 router.get('/:reference', async (req, res) => {
@@ -8,7 +8,7 @@ router.get('/:reference', async (req, res) => {
         res.status(404).send(`error : order not found`);
         return
     }
-    res.status(200).send({ data: order });
+    res.status(200).send({ status: 'success', data: order });
 })
 
 router.post('/', async (req, res) => {
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
     orderData.ref = ref;
     const newOrder = await createOrder(orderData)
 
-    res.status(201).send({ data: newOrder })
+    res.status(201).send({ status: 'success', data: newOrder })
 })
 
 module.exports = router

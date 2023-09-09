@@ -3,7 +3,7 @@ const db = require('./db');
 
 const getProducts = async () => {
     const products = await db.products.find().toArray();
-    console.log(products)
+    // console.log(products)
     return products;
 }
 

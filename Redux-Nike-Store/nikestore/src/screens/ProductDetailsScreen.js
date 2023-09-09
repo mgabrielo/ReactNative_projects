@@ -7,22 +7,24 @@ import { useGetProductQuery } from '../store/api/apiSlice';
 // create a component
 const ProductDetailsScreen = ({ route }) => {
     const id = route.params.id
-    const { data, isLoading, error } = useGetProductQuery(id)
     const { width } = useWindowDimensions();
     // const product = useSelector((state) => state.products.selectedProduct)
     const dispatch = useDispatch()
-    const addToCart = () => {
-        dispatch(addCartItem({ product }))
-    }
-    // console.log(id)
+    const { data, isLoading, error } = useGetProductQuery(id)
     if (isLoading) {
         return <ActivityIndicator />
     }
     if (error) {
         return <Text>Error fetching product : {error.error}</Text>
     }
+    const product = data?.data
 
-    const product = data.data
+    const addToCart = () => {
+        dispatch(addCartItem({ product }))
+    }
+    // console.log(id)
+
+
 
     return (
         <View>

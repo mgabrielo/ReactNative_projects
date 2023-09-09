@@ -12,7 +12,7 @@ const ProductsSlice = createSlice({
   reducers: {
     setSelectedProduct: (state, action) => {
       const productId = action.payload
-      state.selectedProduct = state.products.find((product) => product.id === productId)
+      state.selectedProduct = state.products.find((product) => product._id === productId)
     }
   }
 });

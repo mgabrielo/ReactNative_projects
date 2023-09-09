@@ -6,7 +6,8 @@ import ProductDetailsScreen from "./screens/ProductDetailsScreen";
 import ShoppingCartScreen from "./screens/ShoppingCart";
 import { useSelector } from "react-redux";
 import { Pressable, Text } from "react-native";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import TrackOrder from "./screens/TrackOrder";
 
 
 const Stack = createNativeStackNavigator();
@@ -22,11 +23,24 @@ const Navigation = () => {
                             <FontAwesome5 name='shopping-cart' size={18} color='gray' />
                             <Text style={{ marginLeft: 10, fontWeight: '500' }}>{numberOfItems}</Text>
                         </Pressable>
-                    )
+                    ),
+                    headerLeft: () => (
+                        <MaterialCommunityIcons
+                            onPress={() => navigation.navigate('Track Order')}
+                            name="truck-delivery"
+                            size={22}
+                            color="gray"
+                        />
+                    ),
+                    headerTitleAlign: "center",
+                    headerTitle: () => (
+                        <Text>Home Product Page</Text>
+                    ),
                 })} />
                 <Stack.Screen name="Product Details" component={ProductDetailsScreen}
                     options={{ presentation: 'modal' }} />
                 <Stack.Screen name="Cart" component={ShoppingCartScreen} />
+                <Stack.Screen name="Track Order" component={TrackOrder} />
             </Stack.Navigator>
         </NavigationContainer>
     );

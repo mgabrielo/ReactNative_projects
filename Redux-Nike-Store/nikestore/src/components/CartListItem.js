@@ -6,11 +6,11 @@ import { changeQuantity } from "../store/Cart/CartSlice";
 const CartListItem = ({ cartItem }) => {
   const dispatch = useDispatch()
   const increaseQuantity = () => {
-    dispatch(changeQuantity({ productId: cartItem.product.id, amount: 1 }))
+    dispatch(changeQuantity({ productId: cartItem.product._id, amount: 1 }))
   };
 
   const decreaseQuantity = () => {
-    dispatch(changeQuantity({ productId: cartItem.product.id, amount: -1 }))
+    dispatch(changeQuantity({ productId: cartItem.product._id, amount: -1 }))
   };
 
   return (

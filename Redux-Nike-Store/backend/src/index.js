@@ -14,6 +14,6 @@ app.get('/', (req, res) => {
 const PORT = 3000;
 
 
-app.listen(PORT, 'ipaddress', () => {
+app.listen(PORT, 'ip-address', () => {
     console.log('api running on port : ', PORT)
 })
