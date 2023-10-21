@@ -1,12 +1,12 @@
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useEffect, useLayoutEffect } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { format } from 'date-fns';
+import DialogBox from '../components/Dialog';
 
 
 const JobEditScreen = () => {
@@ -25,6 +25,7 @@ const JobEditScreen = () => {
         postedAt: formattedDate
     });
     const [loading, setLoading] = useState(false)
+    const [isDialogVisible, setDialogVisible] = useState(false);
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -49,18 +50,23 @@ const JobEditScreen = () => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerShown: false,
+            headerShown: true,
             title: 'Edit Job Post',
             headerTitleAlign: 'center',
             headerTitleStyle: {
                 fontSize: 20,
                 fontWeight: 'bold',
-                color: 'white',
+                color: '#003580',
             },
             headerStyle: {
-                backgroundColor: '#003580',
+                backgroundColor: '#fff',
                 height: 100,
             },
+            headerLeft: () => (
+                <Pressable onPress={() => navigation.goBack()}>
+                    <Text style={{ color: '#003580', fontSize: 18, fontWeight: '500' }}>Back</Text>
+                </Pressable>
+            ),
         })
     }, [navigation])
 
@@ -88,86 +94,107 @@ const JobEditScreen = () => {
         }
     }
 
+    const hideDialog = () => {
+        setDialogVisible(false);
+    };
+
+    const showDialog = () => {
+        setDialogVisible(true);
+    };
+
+    const cancelJobPost = () => {
+        setFormData({})
+        navigation.navigate('JobListTab')
+    }
+
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff', padding: 10, alignItems: 'center' }}>
-            <KeyboardAvoidingView>
-                <ScrollView style={{ flex: 1, }} showsVerticalScrollIndicator={false}>
-                    <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 1 }}>
-                        <Text style={{ color: '#003580', fontSize: 20, fontWeight: '700' }}>Edit JobPost</Text>
-                    </View>
-
-                    <View style={{ marginTop: 50, gap: 15 }}>
-                        <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Title</Text>
-                            <TextInput
-                                placeholder='Enter Job Title'
-                                placeholderTextColor={'#a9a9a9'}
-                                value={formData.title}
-                                onChangeText={(text) => setFormData({ ...formData, title: text })}
-                                style={styles.input}
-                            />
-                        </View>
-                        <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Description</Text>
-                            <TextInput
-                                placeholder='Enter Job Description'
-                                textAlign='left'
-                                placeholderTextColor={'#a9a9a9'}
-                                value={formData.description}
-                                multiline={true}
-                                numberOfLines={4}
-                                textAlignVertical='top'
-                                onChangeText={(text) => setFormData({ ...formData, description: text })}
-                                style={styles.input}
-                            />
-                        </View>
-                        <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Salary</Text>
-                            <TextInput
-                                placeholder='Enter Job Salary'
-                                placeholderTextColor={'#a9a9a9'}
-                                value={formData.salary}
-                                keyboardType='numeric'
-                                onChangeText={(text) => setFormData({ ...formData, salary: text })}
-                                style={styles.input}
-                            />
-                        </View>
-                        <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Company Name</Text>
-                            <TextInput
-                                placeholder='Enter your password'
-                                placeholderTextColor={'#a9a9a9'}
-                                value={formData.company}
-                                onChangeText={(text) => setFormData({ ...formData, company: text })}
-                                style={styles.input}
-                            />
-                        </View>
-                    </View>
-                    <Pressable style={styles.button}
-                        onPress={handleSubmit}
-                    >
-                        <Spinner
-                            visible={loading}
-                            color='#fff'
-                            textContent='Please Wait...'
-                            textStyle={{
-                                fontSize: 15,
-                                color: '#fff'
-                            }}
+        <ScrollView style={styles.root} showsVerticalScrollIndicator={false}>
+            <KeyboardAvoidingView style={styles.keyboardView}>
+                <View style={{ marginTop: 50, gap: 15 }}>
+                    <View>
+                        <Text style={styles.label}>Title</Text>
+                        <TextInput
+                            placeholder='Enter Job Title'
+                            placeholderTextColor={'#a9a9a9'}
+                            value={formData.title}
+                            onChangeText={(text) => setFormData({ ...formData, title: text })}
+                            style={styles.input}
                         />
-                        <Text style={{ textAlign: 'center', color: 'white', fontSize: 18, fontWeight: '700' }}>
-                            {loading ? 'Updating...' : 'Update Job Post'}
-                        </Text>
-                    </Pressable>
+                    </View>
+                    <View>
+                        <Text style={styles.label}>Description</Text>
+                        <TextInput
+                            placeholder='Enter Job Description'
+                            textAlign='left'
+                            placeholderTextColor={'#a9a9a9'}
+                            value={formData.description}
+                            multiline={true}
+                            numberOfLines={4}
+                            textAlignVertical='top'
+                            onChangeText={(text) => setFormData({ ...formData, description: text })}
+                            style={styles.input}
+                        />
+                    </View>
+                    <View>
+                        <Text style={styles.label}>Salary (£) </Text>
+                        <TextInput
+                            placeholder='Enter Job Salary'
+                            placeholderTextColor={'#a9a9a9'}
+                            value={formData.salary}
+                            keyboardType='numeric'
+                            onChangeText={(text) => setFormData({ ...formData, salary: text })}
+                            style={styles.input}
+                        />
+                    </View>
+                    <View>
+                        <Text style={styles.label}>Company Name</Text>
+                        <TextInput
+                            placeholder='Enter your password'
+                            placeholderTextColor={'#a9a9a9'}
+                            value={formData.company}
+                            onChangeText={(text) => setFormData({ ...formData, company: text })}
+                            style={styles.input}
+                        />
+                    </View>
+                </View>
+                <Pressable style={styles.button}
+                    onPress={handleSubmit}
+                >
+                    <Spinner
+                        visible={loading}
+                        color='#003580'
+                        size={50}
+                        textContent='Please Wait...'
+                        textStyle={{
+                            fontSize: 20,
+                            color: '#003580'
+                        }}
+                    />
+                    <Text style={styles.submitText}>
+                        {loading ? 'Updating...' : 'Update Job Post'}
+                    </Text>
+                </Pressable>
 
-                    <Pressable style={{ alignItems: 'center', marginVertical: 10 }}
-                        onPress={() => { navigation.navigate('JobList'), setFormData({}) }}
-                    >
-                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#003580' }}>Cancel</Text>
-                    </Pressable>
-                </ScrollView>
+                <Pressable
+                    style={styles.cancelPress}
+                    onPress={showDialog}
+                >
+                    <Text style={styles.cancel}>Cancel</Text>
+                </Pressable>
+                {
+                    isDialogVisible && (
+                        <DialogBox
+                            visible={isDialogVisible}
+                            onClose={hideDialog}
+                            message="Do You Want To Discard This Update!"
+                            actionClick={cancelJobPost}
+                            actionText={"Yes"}
+                            actionTitle={'Cancel Job Post Update ?'}
+                        />
+                    )
+                }
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </ScrollView>
     )
 }
 
@@ -175,9 +202,9 @@ export default JobEditScreen
 
 const styles = StyleSheet.create({
     input: {
-        fontSize: 15,
+        fontSize: 16,
         borderColor: "#003580",
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderRadius: 5,
         marginVertical: 10,
         width: 320,
@@ -189,10 +216,49 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: 'green',
         width: 200,
-        padding: 15,
+        padding: 10,
         borderRadius: 5,
-        marginVertical: 20,
+        marginTop: 15,
+        marginBottom: 5,
         marginLeft: 'auto',
         marginRight: 'auto'
+    },
+    root: {
+        flex: 1,
+        backgroundColor: "white",
+        height: '100%',
+        width: '100%'
+    },
+    label: {
+        fontSize: 18,
+        fontWeight: '600'
+    },
+    keyboardView: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        width: '100%'
+    },
+    cancel: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#003580',
+        textAlign: 'center'
+    },
+    cancelPress: {
+        width: 200,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginVertical: 7,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#003580',
+        borderRadius: 5
+    },
+    submitText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '700'
     }
 })

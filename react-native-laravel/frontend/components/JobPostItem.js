@@ -2,9 +2,13 @@ import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
+import { format, parse } from 'date-fns';
 
 const JobPostItem = ({ item }) => {
     const navigation = useNavigation();
+    const inputDate = item?.postedAt;
+    const parsedDate = parse(inputDate, 'yyyy-MM-dd', new Date());
+    const outputDate = format(parsedDate, 'dd-MM-yyyy');
     return (
         <Pressable onPress={() => {
             navigation.navigate('Details', { id: item.id })
@@ -13,9 +17,8 @@ const JobPostItem = ({ item }) => {
                 <View style={{ flexDirection: 'column', marginVertical: 5, marginHorizontal: 10 }}>
                     <View style={{ padding: 3, gap: 15 }}>
                         <Text style={styles.title}>{item?.title}</Text>
-                        <Text>{item?.company}</Text>
-                        {/* <Text style={styles.salary}>Salary - ${item.salary}</Text> */}
-                        <Text style={styles.postedAt}>{item?.postedAt}</Text>
+                        <Text style={styles.company}>{item?.company}</Text>
+                        <Text style={styles.postedAt}>{outputDate}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 15, }}>
                         <Pressable style={{
@@ -54,12 +57,13 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
+        fontWeight: '600'
     },
     postedAt: {
-        fontSize: 14,
+        fontSize: 15,
     },
-    salary: {
-        fontSize: 14,
-        fontWeight: "bold",
+    company: {
+        fontSize: 17,
+        fontWeight: "400",
     },
 })

@@ -21,26 +21,33 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $errors = implode("\n", $validator->errors()->all());
             return response()->json([
-                'validation_error' => $validator->errors(),
+                'message' => $errors,
             ]);
         } else {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+            $user = User::where('email', $request->email)->first();
 
-            // $token = $user->createToken($user->email . '_Token')->plainTextToken;
+            if ($user) {
 
-            return response()->json([
-                'status' => 200,
-                'user_id' => $user->id,
-                'username' => $user->name,
-                'email' => $user->email,
-                'message' => 'Registration Successful',
-                // 'token' => $token,
-            ]);
+                return response()->json([
+                    'message' => 'User Already Exist',
+                ]);
+            } else {
+
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+
+                return response()->json([
+                    'status' => 200,
+                    'user_id' => $user->id,
+                    'username' => $user->name,
+                    'email' => $user->email,
+                ]);
+            }
         }
     }
 
@@ -53,8 +60,9 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $errors = implode("\n", $validator->errors()->all());
             return response()->json([
-                'validation_error' => $validator->errors(),
+                'message' => $errors,
             ]);
         } else {
             $user = User::where('email', $request->email)->first();
@@ -73,21 +81,8 @@ class AuthController extends Controller
                     'username' => $user->name,
                     'email' => $user->email,
                     'token' => $token,
-                    'message' => 'Login Successful'
                 ]);
             }
         }
-    }
-
-    public function logout(Request $request)
-    {
-        $user = Auth::user();
-        $request->user()->currentAccessToken()->delete();
-        // $request->user('sanctum')->currentAccessToken()->delete();
-        Log::warning($user);
-        return response()->json([
-            'status' => 200,
-            'message' => 'Logout Successful'
-        ]);
     }
 }

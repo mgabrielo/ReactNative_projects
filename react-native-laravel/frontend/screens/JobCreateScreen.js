@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { newJobPostAddSuccess } from '../redux/newJobPost/newJobPostSlice';
+import DialogBox from '../components/Dialog';
 
 
 const JobCreateScreen = () => {
@@ -24,10 +25,11 @@ const JobCreateScreen = () => {
         salary: '',
         company: '',
         postedAt: formattedDate,
-        user_id: currentUser.id
+        user_id: currentUser.user_id
     });
 
     const [loading, setLoading] = useState(false)
+    const [isDialogVisible, setDialogVisible] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -75,8 +77,21 @@ const JobCreateScreen = () => {
         }
     }
 
+    const hideDialog = () => {
+        setDialogVisible(false);
+    };
+
+    const showDialog = () => {
+        setDialogVisible(true);
+    };
+
+    const cancelJobPost = () => {
+        setFormData({})
+        navigation.navigate('JobListTab')
+    }
+
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff', padding: 10, alignItems: 'center' }}>
+        <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView>
                 <ScrollView style={{ flex: 1, }} showsVerticalScrollIndicator={false}>
                     <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 1 }}>
@@ -85,7 +100,7 @@ const JobCreateScreen = () => {
 
                     <View style={{ marginTop: 50, gap: 15 }}>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Title</Text>
+                            <Text style={styles.label}>Title</Text>
                             <TextInput
                                 placeholder='Enter Job Title'
                                 placeholderTextColor={'#a9a9a9'}
@@ -95,7 +110,7 @@ const JobCreateScreen = () => {
                             />
                         </View>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Description</Text>
+                            <Text style={styles.label}>Description</Text>
                             <TextInput
                                 placeholder='Enter Job Description'
                                 textAlign='left'
@@ -109,7 +124,7 @@ const JobCreateScreen = () => {
                             />
                         </View>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Salary</Text>
+                            <Text style={styles.label}>Salary (£) </Text>
                             <TextInput
                                 placeholder='Enter Job Salary'
                                 placeholderTextColor={'#a9a9a9'}
@@ -120,7 +135,7 @@ const JobCreateScreen = () => {
                             />
                         </View>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Company Name</Text>
+                            <Text style={styles.label}>Company Name</Text>
                             <TextInput
                                 placeholder='Enter your Company Name'
                                 placeholderTextColor={'#a9a9a9'}
@@ -135,22 +150,37 @@ const JobCreateScreen = () => {
                     >
                         <Spinner
                             visible={loading}
-                            color='#fff'
+                            color='#003580'
+                            size={50}
                             textContent='Please Wait...'
                             textStyle={{
-                                fontSize: 15,
-                                color: '#fff'
+                                fontSize: 20,
+                                color: '#003580'
                             }}
                         />
-                        <Text style={{ textAlign: 'center', color: 'white', fontSize: 18, fontWeight: '700' }}>
+                        <Text style={styles.submitText}>
                             {loading ? 'Creating...' : 'Create Job Post'}
                         </Text>
                     </Pressable>
 
-                    <Pressable style={{ alignItems: 'center', marginVertical: 10 }}
-                        onPress={() => { navigation.navigate('JobListTab'), setFormData({}) }}>
-                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#003580' }}>Cancel</Text>
+                    <Pressable
+                        style={styles.cancelPress}
+                        onPress={showDialog}
+                    >
+                        <Text style={styles.cancel}>Cancel</Text>
                     </Pressable>
+                    {
+                        isDialogVisible && (
+                            <DialogBox
+                                visible={isDialogVisible}
+                                onClose={hideDialog}
+                                message="Do You Want To Discard This Post!"
+                                actionClick={cancelJobPost}
+                                actionText={"Yes"}
+                                actionTitle={'Cancel Job Post ?'}
+                            />
+                        )
+                    }
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -161,9 +191,9 @@ export default JobCreateScreen
 
 const styles = StyleSheet.create({
     input: {
-        fontSize: 15,
+        fontSize: 16,
         borderColor: "#003580",
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderRadius: 5,
         marginVertical: 10,
         width: 320,
@@ -175,10 +205,43 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: 'green',
         width: 200,
-        padding: 15,
+        padding: 10,
         borderRadius: 5,
-        marginVertical: 20,
+        marginTop: 15,
+        marginBottom: 5,
         marginLeft: 'auto',
         marginRight: 'auto'
+    },
+    label: {
+        fontSize: 18,
+        fontWeight: '600'
+    },
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
+        padding: 10,
+        alignItems: 'center'
+    },
+    cancel: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#003580',
+        textAlign: 'center'
+    },
+    cancelPress: {
+        width: 200,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginVertical: 7,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#003580',
+        borderRadius: 5
+    },
+    submitText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '700'
     }
 })

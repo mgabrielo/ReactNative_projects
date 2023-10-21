@@ -2,8 +2,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import { format, parse } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
 import { newJobPostDeleteSuccess } from '../redux/newJobPost/newJobPostSlice';
+import DialogBox from '../components/Dialog';
 
 const JobDetailScreen = () => {
     const route = useRoute()
@@ -13,6 +15,7 @@ const JobDetailScreen = () => {
     const [job, setJob] = useState([]);
     const { currentUser } = useSelector((state) => state.user)
     const dispatch = useDispatch();
+    const [isDialogVisible, setDialogVisible] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -29,7 +32,11 @@ const JobDetailScreen = () => {
                 backgroundColor: '#003580',
                 height: 100,
             },
-
+            headerLeft: () => (
+                <Pressable onPress={() => navigation.goBack()}>
+                    <Text style={{ color: '#fff', fontSize: 18 }}>Back</Text>
+                </Pressable>
+            ),
         })
     }, [navigation])
 
@@ -57,8 +64,8 @@ const JobDetailScreen = () => {
 
     }, [])
 
-    const handleDelete = async (e) => {
-        e.preventDefault();
+    const handleDelete = async () => {
+
         const authToken = currentUser.token
         try {
             const res = await axios.delete(`${BASE_URL}/api/jobs/${id}`, {
@@ -79,6 +86,24 @@ const JobDetailScreen = () => {
             console.log(error)
         }
     }
+    const convertDate = () => {
+        if (job?.postedAt) {
+            const inputDate = job?.postedAt
+            const parsedDate = parse(inputDate, 'yyyy-MM-dd', new Date());
+            const outputDate = format(parsedDate, 'dd-MM-yyyy');
+            return outputDate;
+        }
+        return;
+    }
+
+    const hideDialog = () => {
+        setDialogVisible(false);
+    };
+
+    const showDialog = () => {
+        setDialogVisible(true);
+    };
+
 
     return (
         <ScrollView style={styles.root}>
@@ -101,7 +126,7 @@ const JobDetailScreen = () => {
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.label}>Job Posted on:</Text>
-                    <Text style={styles.title}>{job.postedAt}</Text>
+                    <Text style={styles.title}>{convertDate()}</Text>
                 </View>
             </View>
 
@@ -119,12 +144,24 @@ const JobDetailScreen = () => {
                             </Text>
                         </Pressable>
                         <Pressable style={[styles.button, { backgroundColor: 'red', }]}
-                            onPress={handleDelete}
+                            onPress={showDialog}
                         >
                             <Text style={{ textAlign: 'center', color: 'white', fontSize: 18, fontWeight: '700' }}>
                                 Delete
                             </Text>
                         </Pressable>
+                        {
+                            isDialogVisible && (
+                                <DialogBox
+                                    visible={isDialogVisible}
+                                    onClose={hideDialog}
+                                    message="Do You Want To Delete This Post!"
+                                    actionClick={handleDelete}
+                                    actionText={"Yes"}
+                                    actionTitle={'Delete Job Post ?'}
+                                />
+                            )
+                        }
                     </View>
                 )
             }
