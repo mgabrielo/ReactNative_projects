@@ -5,29 +5,30 @@ import { Ionicons } from '@expo/vector-icons';
 import JobPostItem from '../components/JobPostItem';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { newJobPostUpdateSuccess } from '../redux/newJobPost/newJobPostSlice';
-import { signOutUserSuccess } from '../redux/user/userSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { newJobPostListFailure, newJobPostListStart, newJobPostListSuccess } from '../redux/newJobPost/newJobPostSlice';
+import { signOutUserStart, signOutUserSuccess, signOutUserFailure } from '../redux/user/userSlice';
 import { Entypo } from '@expo/vector-icons';
 import DialogBox from '../components/Dialog';
+import Spinner from 'react-native-loading-spinner-overlay';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const JobListScreen = () => {
   const navigation = useNavigation();
   const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
-  const { currentUser } = useSelector((state) => state.user)
-  const { newJobPost } = useSelector((state) => state.newJobPost)
-  const [loading, setLoading] = useState(true)
+  const { currentUser, loading } = useSelector((state) => state.user)
+  const { newJobPost, jobPostLoading } = useSelector((state) => state.newJobPost)
   const [refresh, setRefresh] = useState(false);
   const [isDialogVisible, setDialogVisible] = useState(false);
-
+  console.log('newJobPost', newJobPost)
   const dispatch = useDispatch()
-  // console.log('newJobPost', newJobPost)
   console.log('currentUser-token', currentUser.token)
 
   const getJobs = async () => {
+
     try {
-      if (loading) {
+      if (jobPostLoading) {
+        dispatch(newJobPostListStart())
         const authToken = currentUser.token
         const res = await axios.get(`${BASE_URL}/api/jobs`, {
           headers: {
@@ -35,15 +36,18 @@ const JobListScreen = () => {
           }
         })
         const data = await res.data
+        console.log('dataTT:', data)
         if (data.status == 200) {
           console.log('dataTT:', data)
-          dispatch(newJobPostUpdateSuccess(data.jobpost));
-          setLoading(false)
+
+          dispatch(newJobPostListSuccess(data.jobpost));
+        } else {
+          dispatch(newJobPostListFailure())
         }
       }
     } catch (error) {
+      dispatch(newJobPostListFailure())
       console.log(error)
-      setLoading(false)
     }
   }
 
@@ -91,10 +95,29 @@ const JobListScreen = () => {
     setDialogVisible(true);
   };
 
-  const logout = () => {
-    setDialogVisible(false)
-    dispatch(signOutUserSuccess())
-    navigation.navigate('Login')
+  const logout = async () => {
+
+    try {
+      dispatch(signOutUserStart())
+      hideDialog()
+      await axios.post(`${BASE_URL}/api/logout`, null, {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }).then((res) => {
+        if (res.data.status == 200) {
+          dispatch(signOutUserSuccess())
+          navigation.navigate('Login')
+        }
+      }).catch((err) => {
+        dispatch(signOutUserFailure(err?.message))
+        console.log(err)
+      })
+    } catch (error) {
+      dispatch(signOutUserFailure())
+    }
   }
 
   return (
@@ -110,6 +133,19 @@ const JobListScreen = () => {
             actionTitle={'Confirm Sign Out'}
           />
         )
+      }
+      {jobPostLoading || loading && (
+        <Spinner
+          visible={jobPostLoading || loading}
+          color='#003580'
+          size={50}
+          textContent='Please Wait...'
+          textStyle={{
+            fontSize: 20,
+            color: '#003580'
+          }}
+        />
+      )
       }
       {
         newJobPost ? (

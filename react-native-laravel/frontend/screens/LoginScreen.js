@@ -47,21 +47,21 @@ const LoginScreen = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-
             dispatch(signInStart())
-
-            axios.post(`${BASE_URL}/api/login`, formData).then((res) => {
-                const data = res.data
-                if (data.status == 200) {
-                    dispatch(signInSuccess(data))
-                    console.log(data)
-                    setFormData({})
-                    navigation.navigate('Main')
-                } else {
-                    dispatch(signInFailure(data.message))
-                }
-            }).catch(() => {
-                dispatch(signInFailure('Error Logging in'))
+            await axios.get(`${BASE_URL}/sanctum/csrf-cookie`).then(response => {
+                axios.post(`${BASE_URL}/api/login`, formData).then((res) => {
+                    const data = res.data
+                    if (data.status == 200) {
+                        dispatch(signInSuccess(data))
+                        console.log(data)
+                        setFormData({})
+                        navigation.navigate('Main')
+                    } else {
+                        dispatch(signInFailure(data.message))
+                    }
+                }).catch(() => {
+                    dispatch(signInFailure('Error Logging in'))
+                })
             })
 
         } catch (error) {
@@ -108,7 +108,7 @@ const LoginScreen = () => {
                     </View>
                     <Pressable style={styles.button}
                         onPress={handleSubmit}
-                        disabled={loading}
+                    // disabled={loading}
                     >
                         <Spinner
                             visible={loading}

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { newJobPostAddSuccess } from '../redux/newJobPost/newJobPostSlice';
+import { newJobPostAddFailure, newJobPostAddStart, newJobPostAddSuccess } from '../redux/newJobPost/newJobPostSlice';
 import DialogBox from '../components/Dialog';
 
 
@@ -16,19 +16,19 @@ const JobCreateScreen = () => {
     const dispatch = useDispatch()
     const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
     const { currentUser } = useSelector((state) => state.user)
+    const { jobPostLoading, errorjobPost } = useSelector((state) => state.newJobPost)
     const date = new Date();
-    const formattedDate = format(date, 'd-M-y');
+    const postedAt = format(date, 'd-M-y');
 
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         salary: '',
         company: '',
-        postedAt: formattedDate,
+        postedAt,
         user_id: currentUser.user_id
     });
 
-    const [loading, setLoading] = useState(false)
     const [isDialogVisible, setDialogVisible] = useState(false);
 
     useLayoutEffect(() => {
@@ -52,27 +52,33 @@ const JobCreateScreen = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formattedDate)
+
         try {
-            // console.log(formData)
-            setLoading(true)
+            dispatch(newJobPostAddStart())
             const authToken = currentUser.token
             console.log(authToken)
-            const res = await axios.post(`${BASE_URL}/api/jobs`, formData, {
+            await axios.post(`${BASE_URL}/api/jobs`, formData, {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
+            }).then((res) => {
+                const data = res.data.jobpost;
+                if (res.data.status !== 200) {
+                    dispatch(newJobPostAddFailure(res.data.message))
+                    return;
+                } else {
+                    console.log('formData:', data)
+                    dispatch(newJobPostAddSuccess(data))
+                    setFormData({})
+                    navigation.navigate('JobListTab')
+                }
+            }).catch((err) => {
+                dispatch(newJobPostAddFailure(err?.message))
             })
-            const data = await res.data.jobpost;
-            console.log('formData:', data)
-            dispatch(newJobPostAddSuccess(data))
-            setFormData({})
-            navigation.navigate('JobListTab')
-            setLoading(false)
+
         } catch (error) {
-            setLoading(false)
             console.log(error)
         }
     }
@@ -81,9 +87,11 @@ const JobCreateScreen = () => {
         setDialogVisible(false);
     };
 
+
     const showDialog = () => {
         setDialogVisible(true);
     };
+
 
     const cancelJobPost = () => {
         setFormData({})
@@ -149,7 +157,7 @@ const JobCreateScreen = () => {
                         onPress={handleSubmit}
                     >
                         <Spinner
-                            visible={loading}
+                            visible={jobPostLoading}
                             color='#003580'
                             size={50}
                             textContent='Please Wait...'
@@ -159,7 +167,7 @@ const JobCreateScreen = () => {
                             }}
                         />
                         <Text style={styles.submitText}>
-                            {loading ? 'Creating...' : 'Create Job Post'}
+                            {jobPostLoading ? 'Creating...' : 'Create Job Post'}
                         </Text>
                     </Pressable>
 
@@ -178,6 +186,16 @@ const JobCreateScreen = () => {
                                 actionClick={cancelJobPost}
                                 actionText={"Yes"}
                                 actionTitle={'Cancel Job Post ?'}
+                            />
+                        )
+                    }
+                    {
+                        errorjobPost && (
+                            <DialogBox
+                                visible={true}
+                                onClose={() => dispatch(newJobPostAddFailure(null))}
+                                message={errorjobPost}
+                                actionTitle={'Job Post Error'}
                             />
                         )
                     }

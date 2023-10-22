@@ -7,18 +7,25 @@ use App\Models\JobPost;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+
 
 class JobPostController extends Controller
 {
     public function alljobs()
     {
         $jobpost = JobPost::orderBy('postedAt', 'DESC')->get();
-        return response()->json([
-            'status' => 200,
-            'jobpost' => $jobpost,
-        ]);
+
+        if (!$jobpost) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'No JobPost Available'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 200,
+                'jobpost' => $jobpost,
+            ]);
+        }
     }
 
     public function details($id)
@@ -49,9 +56,10 @@ class JobPostController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $errors = implode("\n", $validator->errors()->all());
             return response()->json([
                 'status' => 400,
-                'errors' => $validator->errors(),
+                'message' => $errors
             ]);
         } else {
 
@@ -84,9 +92,11 @@ class JobPostController extends Controller
         ]);
 
         if ($validator->fails()) {
+
+            $errors = implode("\n", $validator->errors()->all());
             return response()->json([
                 'status' => 422,
-                'errors' => $validator->errors(),
+                'message' => $errors,
             ]);
         } else {
 
@@ -112,12 +122,13 @@ class JobPostController extends Controller
                     $jobpost->save();
                     return response()->json([
                         'status' => 200,
+                        'jobpost' =>  $jobpost,
                         'message' => 'JobPost Updated Successfully'
                     ]);
                 } else {
                     return response()->json([
                         'status' => 404,
-                        'message' => 'No JobPost ID Found'
+                        'message' => 'No JobPost Found'
                     ]);
                 }
             }
@@ -148,7 +159,7 @@ class JobPostController extends Controller
             } else {
                 return response()->json([
                     'status' => 404,
-                    'message' => 'No JobPost ID Found'
+                    'message' => 'This JobPost is No Longer Avaiable'
                 ]);
             }
         }

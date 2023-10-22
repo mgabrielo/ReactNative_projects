@@ -3,10 +3,11 @@ import React, { useEffect, useLayoutEffect } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import Spinner from 'react-native-loading-spinner-overlay';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { format } from 'date-fns';
 import DialogBox from '../components/Dialog';
+import { newJobPostUpdateFailure, newJobPostUpdateStart, newJobPostUpdateSuccess } from '../redux/newJobPost/newJobPostSlice';
 
 
 const JobEditScreen = () => {
@@ -15,6 +16,7 @@ const JobEditScreen = () => {
     const { id } = route.params;
     const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
     const { currentUser } = useSelector((state) => state.user)
+    const { jobPostLoading, errorjobPost } = useSelector((state) => state.newJobPost)
     const date = new Date();
     const formattedDate = format(date, 'Y-m-d');
     const [formData, setFormData] = useState({
@@ -24,7 +26,7 @@ const JobEditScreen = () => {
         company: '',
         postedAt: formattedDate
     });
-    const [loading, setLoading] = useState(false)
+    const dispatch = useDispatch()
     const [isDialogVisible, setDialogVisible] = useState(false);
 
     useEffect(() => {
@@ -39,10 +41,9 @@ const JobEditScreen = () => {
             })
             const data = res.data;
             if (data.status == 200) {
-                setLoading(false)
+                // setLoading(false)
                 console.log("the-data", data)
                 setFormData(data.jobpost)
-
             }
         }
         fetchJob()
@@ -74,22 +75,31 @@ const JobEditScreen = () => {
         e.preventDefault();
         try {
             console.log('update-form', formData)
-            setLoading(true)
+            dispatch(newJobPostUpdateStart())
             const authToken = currentUser.token
-            const res = await axios.put(`${BASE_URL}/api/jobs/${id}`, formData, {
+            await axios.put(`${BASE_URL}/api/jobs/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
+            }).then((res) => {
+                const data = res.data.jobpost;
+                if (res.data.status !== 200) {
+                    dispatch(newJobPostUpdateFailure(res.data.message))
+                    return;
+                } else {
+                    console.log('formData:', data)
+                    dispatch(newJobPostUpdateSuccess(data))
+                    setFormData({})
+                    navigation.navigate('JobListTab')
+                }
+            }).catch((err) => {
+                dispatch(newJobPostUpdateFailure(err?.message))
             })
-            const data = await res.data;
-            setLoading(false)
-            console.log("update-data", data)
-            navigation.navigate('JobListTab')
 
         } catch (error) {
-            setLoading(false)
+            // setLoading(false)
             console.log(error)
         }
     }
@@ -161,7 +171,7 @@ const JobEditScreen = () => {
                     onPress={handleSubmit}
                 >
                     <Spinner
-                        visible={loading}
+                        visible={jobPostLoading}
                         color='#003580'
                         size={50}
                         textContent='Please Wait...'
@@ -171,7 +181,7 @@ const JobEditScreen = () => {
                         }}
                     />
                     <Text style={styles.submitText}>
-                        {loading ? 'Updating...' : 'Update Job Post'}
+                        {jobPostLoading ? 'Updating...' : 'Update Job Post'}
                     </Text>
                 </Pressable>
 
@@ -190,6 +200,16 @@ const JobEditScreen = () => {
                             actionClick={cancelJobPost}
                             actionText={"Yes"}
                             actionTitle={'Cancel Job Post Update ?'}
+                        />
+                    )
+                }
+                {
+                    errorjobPost && (
+                        <DialogBox
+                            visible={true}
+                            onClose={() => dispatch(newJobPostUpdateFailure(null))}
+                            message={errorjobPost}
+                            actionTitle={'Job Post Error'}
                         />
                     )
                 }

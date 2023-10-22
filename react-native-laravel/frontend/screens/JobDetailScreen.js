@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import { format, parse } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
-import { newJobPostDeleteSuccess } from '../redux/newJobPost/newJobPostSlice';
+import { newJobPostDeleteFailure, newJobPostDeleteStart, newJobPostDeleteSuccess } from '../redux/newJobPost/newJobPostSlice';
 import DialogBox from '../components/Dialog';
 
 const JobDetailScreen = () => {
@@ -68,6 +68,7 @@ const JobDetailScreen = () => {
 
         const authToken = currentUser.token
         try {
+            dispatch(newJobPostDeleteStart())
             const res = await axios.delete(`${BASE_URL}/api/jobs/${id}`, {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -80,6 +81,8 @@ const JobDetailScreen = () => {
             if (data.status == 200) {
                 dispatch(newJobPostDeleteSuccess(id))
                 navigation.navigate('JobListTab')
+            } else {
+                dispatch(newJobPostDeleteFailure(res.data.message))
             }
 
         } catch (error) {
