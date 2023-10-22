@@ -13,7 +13,7 @@ const DialogBox = ({ visible, onClose, message, actionClick, actionText, actionT
             <Dialog.Description>
                 {message}
             </Dialog.Description>
-            <Dialog.Button label="Cancel" onPress={onClose} />
+            <Dialog.Button label="Cancel" style={{}} onPress={onClose} />
             {actionText && (<Dialog.Button label={actionText} onPress={handleClick} />)}
         </Dialog.Container>
     );

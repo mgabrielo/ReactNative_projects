@@ -9,7 +9,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { newJobPostAddFailure, newJobPostAddStart, newJobPostAddSuccess } from '../redux/newJobPost/newJobPostSlice';
 import DialogBox from '../components/Dialog';
-
+import Toast from 'react-native-toast-message';
 
 const JobCreateScreen = () => {
     const navigation = useNavigation();
@@ -18,14 +18,14 @@ const JobCreateScreen = () => {
     const { currentUser } = useSelector((state) => state.user)
     const { jobPostLoading, errorjobPost } = useSelector((state) => state.newJobPost)
     const date = new Date();
-    const postedAt = format(date, 'd-M-y');
+    const postedDate = format(date, 'd-M-y');
 
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         salary: '',
         company: '',
-        postedAt,
+        postedAt: postedDate,
         user_id: currentUser.user_id
     });
 
@@ -56,7 +56,6 @@ const JobCreateScreen = () => {
         try {
             dispatch(newJobPostAddStart())
             const authToken = currentUser.token
-            console.log(authToken)
             await axios.post(`${BASE_URL}/api/jobs`, formData, {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -69,7 +68,11 @@ const JobCreateScreen = () => {
                     dispatch(newJobPostAddFailure(res.data.message))
                     return;
                 } else {
-                    console.log('formData:', data)
+                    Toast.show({
+                        type: 'success',
+                        text1: res.data.message,
+                        visibilityTime: 5000
+                    });
                     dispatch(newJobPostAddSuccess(data))
                     setFormData({})
                     navigation.navigate('JobListTab')

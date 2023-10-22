@@ -6,6 +6,9 @@ import { format, parse } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
 import { newJobPostDeleteFailure, newJobPostDeleteStart, newJobPostDeleteSuccess } from '../redux/newJobPost/newJobPostSlice';
 import DialogBox from '../components/Dialog';
+import { NumericFormat } from 'react-number-format';
+import Toast from 'react-native-toast-message';
+
 
 const JobDetailScreen = () => {
     const route = useRoute()
@@ -50,7 +53,7 @@ const JobDetailScreen = () => {
                     }
                 })
                 const data = res.data
-                // console.log(data)
+
                 if (data.status == 200) {
                     setJob(data.jobpost)
                 }
@@ -62,7 +65,7 @@ const JobDetailScreen = () => {
 
         getJob()
 
-    }, [])
+    }, [id])
 
     const handleDelete = async () => {
 
@@ -77,8 +80,12 @@ const JobDetailScreen = () => {
 
             const data = await res.data
 
-            console.log('delete:', data)
             if (data.status == 200) {
+                Toast.show({
+                    type: 'success',
+                    text1: data.message,
+                    visibilityTime: 5000
+                });
                 dispatch(newJobPostDeleteSuccess(id))
                 navigation.navigate('JobListTab')
             } else {
@@ -116,12 +123,18 @@ const JobDetailScreen = () => {
                     <Text style={styles.title}>{job.title}</Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.label}>Salary:</Text>
-                    <Text style={styles.title}>£ {job.salary}</Text>
-                </View>
-                <View style={styles.section}>
                     <Text style={styles.label}>Company:</Text>
                     <Text style={styles.title}>{job.company}</Text>
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.label}>Salary:</Text>
+                    <NumericFormat
+                        value={job.salary}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        prefix={'£'}
+                        renderText={formattedValue => <Text style={styles.title} >{formattedValue}</Text>}
+                    />
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.label}>Job Description:</Text>

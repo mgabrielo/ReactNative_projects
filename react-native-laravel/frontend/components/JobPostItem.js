@@ -3,6 +3,7 @@ import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
 import { format, parse } from 'date-fns';
+import { NumericFormat } from 'react-number-format';
 
 const JobPostItem = ({ item }) => {
     const navigation = useNavigation();
@@ -18,6 +19,13 @@ const JobPostItem = ({ item }) => {
                     <View style={{ padding: 3, gap: 15 }}>
                         <Text style={styles.title}>{item?.title}</Text>
                         <Text style={styles.company}>{item?.company}</Text>
+                        <NumericFormat
+                            value={item?.salary}
+                            displayType={'text'}
+                            thousandSeparator={true}
+                            prefix={'£'}
+                            renderText={formattedValue => <Text style={[styles.title, { color: '#003580', fontWeight: '600' }]} >{formattedValue}</Text>}
+                        />
                         <Text style={styles.postedAt}>{outputDate}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 15, }}>
@@ -48,16 +56,19 @@ export default JobPostItem
 
 const styles = StyleSheet.create({
     root: {
-        marginTop: 10,
+        marginTop: 3,
         borderWidth: 1,
         borderColor: "#d1d1d1",
         borderRadius: 5,
         backgroundColor: "#fff",
-        padding: 5
+        padding: 5,
+        elevation: 2,
+        marginVertical: 5
     },
     title: {
         fontSize: 18,
-        fontWeight: '600'
+        fontWeight: '600',
+        marginVertical: 2
     },
     postedAt: {
         fontSize: 15,

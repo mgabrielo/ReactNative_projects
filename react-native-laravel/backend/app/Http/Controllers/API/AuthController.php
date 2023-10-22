@@ -46,6 +46,7 @@ class AuthController extends Controller
                     'user_id' => $user->id,
                     'username' => $user->name,
                     'email' => $user->email,
+                    'message' => 'Registration Successful'
                 ]);
             }
         }
@@ -81,6 +82,7 @@ class AuthController extends Controller
                     'username' => $user->name,
                     'email' => $user->email,
                     'token' => $token,
+                    'message' => 'Sign In Successful'
                 ]);
             }
         }
@@ -89,10 +91,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // $user = User::where('id', $request->email)->first();
-        // $tokenId = PersonalAccessToken::where('id' , $request->id)->first();
-        // $user->tokens()->where('id', $tokenId)->delete();
-
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'status' => 200,

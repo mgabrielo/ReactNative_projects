@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { format } from 'date-fns';
 import DialogBox from '../components/Dialog';
-import { newJobPostUpdateFailure, newJobPostUpdateStart, newJobPostUpdateSuccess } from '../redux/newJobPost/newJobPostSlice';
-
+import { newJobPostDetailFailure, newJobPostDetailStart, newJobPostDetailSuccess, newJobPostUpdateFailure, newJobPostUpdateStart, newJobPostUpdateSuccess } from '../redux/newJobPost/newJobPostSlice';
+import Toast from 'react-native-toast-message';
 
 const JobEditScreen = () => {
     const navigation = useNavigation();
@@ -31,19 +31,25 @@ const JobEditScreen = () => {
 
     useEffect(() => {
         const fetchJob = async () => {
-            const authToken = currentUser.token
-            const res = await axios.get(`${BASE_URL}/api/jobs/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-            })
-            const data = res.data;
-            if (data.status == 200) {
-                // setLoading(false)
-                console.log("the-data", data)
-                setFormData(data.jobpost)
+            try {
+                newJobPostDetailStart()
+                const authToken = currentUser.token
+                const res = await axios.get(`${BASE_URL}/api/jobs/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                const data = res.data;
+                if (data.status == 200) {
+                    newJobPostDetailSuccess()
+                    setFormData(data.jobpost)
+                } else {
+                    newJobPostDetailFailure(data.message)
+                }
+            } catch (error) {
+                console.log(error)
             }
         }
         fetchJob()
@@ -74,7 +80,6 @@ const JobEditScreen = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log('update-form', formData)
             dispatch(newJobPostUpdateStart())
             const authToken = currentUser.token
             await axios.put(`${BASE_URL}/api/jobs/${id}`, formData, {
@@ -89,7 +94,11 @@ const JobEditScreen = () => {
                     dispatch(newJobPostUpdateFailure(res.data.message))
                     return;
                 } else {
-                    console.log('formData:', data)
+                    Toast.show({
+                        type: 'success',
+                        text1: res.data.message,
+                        visibilityTime: 5000
+                    });
                     dispatch(newJobPostUpdateSuccess(data))
                     setFormData({})
                     navigation.navigate('JobListTab')
@@ -99,7 +108,6 @@ const JobEditScreen = () => {
             })
 
         } catch (error) {
-            // setLoading(false)
             console.log(error)
         }
     }
@@ -228,7 +236,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginVertical: 10,
         width: 320,
-        paddingVertical: 5,
+        paddingVertical: 2,
         paddingHorizontal: 10,
         textAlign: 'left',
         lineHeight: 25

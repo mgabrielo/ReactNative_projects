@@ -10,7 +10,6 @@ import { signOutUserStart, signOutUserSuccess, signOutUserFailure } from '../red
 import { Entypo } from '@expo/vector-icons';
 import DialogBox from '../components/Dialog';
 import Spinner from 'react-native-loading-spinner-overlay';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const JobListScreen = () => {
   const navigation = useNavigation();
@@ -20,12 +19,9 @@ const JobListScreen = () => {
   const { newJobPost, jobPostLoading } = useSelector((state) => state.newJobPost)
   const [refresh, setRefresh] = useState(false);
   const [isDialogVisible, setDialogVisible] = useState(false);
-  console.log('newJobPost', newJobPost)
   const dispatch = useDispatch()
-  console.log('currentUser-token', currentUser.token)
 
   const getJobs = async () => {
-
     try {
       if (jobPostLoading) {
         dispatch(newJobPostListStart())
@@ -36,10 +32,7 @@ const JobListScreen = () => {
           }
         })
         const data = await res.data
-        console.log('dataTT:', data)
         if (data.status == 200) {
-          console.log('dataTT:', data)
-
           dispatch(newJobPostListSuccess(data.jobpost));
         } else {
           dispatch(newJobPostListFailure())
@@ -96,7 +89,6 @@ const JobListScreen = () => {
   };
 
   const logout = async () => {
-
     try {
       dispatch(signOutUserStart())
       hideDialog()
@@ -116,7 +108,7 @@ const JobListScreen = () => {
         console.log(err)
       })
     } catch (error) {
-      dispatch(signOutUserFailure())
+      console.log(error)
     }
   }
 
@@ -148,7 +140,7 @@ const JobListScreen = () => {
       )
       }
       {
-        newJobPost ? (
+        newJobPost && newJobPost.length > 0 ? (
           <View style={{ paddingHorizontal: 7, marginVertical: 4 }}>
             <FlatList
               data={newJobPost}

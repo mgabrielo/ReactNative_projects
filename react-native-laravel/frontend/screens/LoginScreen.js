@@ -2,12 +2,12 @@ import { KeyboardAvoidingView, Pressable, SafeAreaView, ScrollView, StyleSheet, 
 import React, { useLayoutEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import Spinner from 'react-native-loading-spinner-overlay';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
 import { useEffect } from 'react';
 import axios from 'axios';
 import DialogBox from '../components/Dialog';
+import Toast from 'react-native-toast-message';
 
 
 const LoginScreen = () => {
@@ -17,7 +17,6 @@ const LoginScreen = () => {
     const [isDialogVisible, setDialogVisible] = useState(false);
     const dispatch = useDispatch();
     const { token, error, loading } = useSelector((state) => state.user);
-    // console.log('LoginError:', error)
 
     useEffect(() => {
         if (token) {
@@ -52,8 +51,13 @@ const LoginScreen = () => {
                 axios.post(`${BASE_URL}/api/login`, formData).then((res) => {
                     const data = res.data
                     if (data.status == 200) {
+                        Toast.show({
+                            type: 'success',
+                            text1: data.message,
+                            text2: 'Welcome to Job Post App',
+                            visibilityTime: 5000
+                        });
                         dispatch(signInSuccess(data))
-                        console.log(data)
                         setFormData({})
                         navigation.navigate('Main')
                     } else {
@@ -108,7 +112,7 @@ const LoginScreen = () => {
                     </View>
                     <Pressable style={styles.button}
                         onPress={handleSubmit}
-                    // disabled={loading}
+                        disabled={loading}
                     >
                         <Spinner
                             visible={loading}

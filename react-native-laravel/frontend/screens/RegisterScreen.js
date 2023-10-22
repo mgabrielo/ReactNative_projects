@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerFailure, registerStart, registerSuccess } from '../redux/user/userSlice';
 import DialogBox from '../components/Dialog';
+import Toast from 'react-native-toast-message';
 
 const RegisterScreen = () => {
     const navigation = useNavigation();
@@ -14,7 +15,6 @@ const RegisterScreen = () => {
     const { error, loading } = useSelector((state) => state.user);
     const [isDialogVisible, setDialogVisible] = useState(false);
     const dispatch = useDispatch()
-    console.log('registerError', error)
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -49,7 +49,11 @@ const RegisterScreen = () => {
             const data = await res.data
 
             if (data.status == 200) {
-                console.log(data)
+                Toast.show({
+                    type: 'success',
+                    text1: data.message,
+                    visibilityTime: 5000
+                });
                 dispatch(registerSuccess())
                 setFormData({})
                 navigation.navigate('Login')
@@ -80,34 +84,34 @@ const RegisterScreen = () => {
 
                     <View style={{ marginTop: 50, gap: 15 }}>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Name</Text>
+                            <Text style={styles.label}>Name</Text>
                             <TextInput
                                 placeholder='Enter your name'
                                 placeholderTextColor={'black'}
                                 value={formData.name}
                                 onChangeText={(text) => setFormData({ ...formData, name: text })}
-                                style={[styles.textinput, { fontSize: formData.name ? 15 : 17, }]}
+                                style={styles.textinput}
                             />
                         </View>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Email</Text>
+                            <Text style={styles.label}>Email</Text>
                             <TextInput
                                 placeholder='Enter your email'
                                 placeholderTextColor={'black'}
                                 value={formData.email}
                                 onChangeText={(text) => setFormData({ ...formData, email: text })}
-                                style={[styles.textinput, { fontSize: formData.email ? 15 : 17, }]}
+                                style={styles.textinput}
                             />
                         </View>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Password</Text>
+                            <Text style={styles.label}>Password</Text>
                             <TextInput
                                 secureTextEntry={true}
                                 placeholder='Enter your password'
                                 placeholderTextColor={'black'}
                                 value={formData.password}
                                 onChangeText={(text) => setFormData({ ...formData, password: text })}
-                                style={[styles.textinput, { fontSize: formData.password ? 15 : 17, }]}
+                                style={styles.textinput}
                             />
                         </View>
                     </View>
@@ -166,6 +170,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         paddingVertical: 5,
         width: 320,
+        fontSize: 17
     },
     buttonText: {
         textAlign: 'center',
@@ -178,5 +183,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 1,
         alignItems: 'center'
+    },
+    label: {
+        fontSize: 18,
+        fontWeight: '600'
     }
 })

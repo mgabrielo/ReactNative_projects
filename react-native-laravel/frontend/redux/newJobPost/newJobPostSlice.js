@@ -47,13 +47,24 @@ const newJobPostSlice = createSlice({
             state.jobPostLoading = false
             state.errorjobPost = action.payload
         },
+        newJobPostDetailStart: (state) => {
+            state.jobPostLoading = true
+            state.errorjobPost = null
+        },
+        newJobPostDetailSuccess: (state, action) => {
+            state.jobPostLoading = false
+            state.errorjobPost = null
+        },
+        newJobPostDetailFailure: (state, action) => {
+            state.jobPostLoading = false
+            state.errorjobPost = action.payload
+        },
         newJobPostUpdateStart: (state) => {
             state.jobPostLoading = true
             state.errorjobPost = null
         },
         newJobPostUpdateSuccess: (state, action) => {
             const jobPostItem = action.payload
-            console.log('jobPostItem', jobPostItem)
             const existingItem = state.newJobPost.find((item) => item.id === jobPostItem.id);
             if (existingItem) {
                 const index = state.newJobPost.findIndex((item) => item.id === jobPostItem.id);
@@ -100,6 +111,9 @@ export const {
     newJobPostListStart,
     newJobPostListSuccess,
     newJobPostListFailure,
+    newJobPostDetailStart,
+    newJobPostDetailSuccess,
+    newJobPostDetailFailure,
     newJobPostDeleteStart,
     newJobPostDeleteSuccess,
     newJobPostDeleteFailure
