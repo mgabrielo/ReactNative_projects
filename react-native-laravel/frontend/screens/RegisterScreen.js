@@ -75,14 +75,18 @@ const RegisterScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} showsVerticalScrollIndicator={false}>
-                    <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                        <Text style={{ color: '#003580', fontSize: 18, fontWeight: '700' }}>Welcome to JobPost App</Text>
-                        <Text style={{ marginTop: 15, fontWeight: '500', fontSize: 15 }}>Create Your Account</Text>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior="height" enabled>
+                <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                    <View style={styles.headerView}>
+                        <Text style={styles.welcomeView}>
+                            Welcome to JobPost App
+                        </Text>
+                        <Text style={styles.createAccountView}>
+                            Create Your Account
+                        </Text>
                     </View>
 
-                    <View style={{ marginTop: 50, gap: 15 }}>
+                    <View style={styles.mainInputView}>
                         <View>
                             <Text style={styles.label}>Name</Text>
                             <TextInput
@@ -133,8 +137,11 @@ const RegisterScreen = () => {
                         </Text>
                     </Pressable>
 
-                    <Pressable style={{ alignItems: 'center', marginVertical: 10 }} onPress={() => navigation.navigate('Login')}>
-                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#003580' }}>Already Have An Account ? Sign In</Text>
+                    <Pressable
+                        style={styles.loginPress}
+                        onPress={() => navigation.navigate('Login')}
+                    >
+                        <Text style={styles.loginRedirect}>Already Have An Account ? Sign In</Text>
                     </Pressable>
                     {
                         error && (
@@ -187,5 +194,37 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 18,
         fontWeight: '600'
+    },
+    loginPress: {
+        alignItems: 'center',
+        marginVertical: 10
+    },
+    loginRedirect: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#003580'
+    },
+    welcomeView: {
+        color: '#003580',
+        fontSize: 18,
+        fontWeight: '700'
+    },
+    createAccountView: {
+        marginTop: 15,
+        fontWeight: '500',
+        fontSize: 15
+    },
+    headerView: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 50
+    },
+    scrollView: {
+        flex: 1,
+        backgroundColor: '#fff'
+    },
+    mainInputView: {
+        marginTop: 50,
+        gap: 15
     }
 })

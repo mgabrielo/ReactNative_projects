@@ -7,8 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { format } from 'date-fns';
 import DialogBox from '../components/Dialog';
-import { newJobPostDetailFailure, newJobPostDetailStart, newJobPostDetailSuccess, newJobPostUpdateFailure, newJobPostUpdateStart, newJobPostUpdateSuccess } from '../redux/newJobPost/newJobPostSlice';
 import Toast from 'react-native-toast-message';
+import {
+    newJobPostDetailFailure,
+    newJobPostDetailStart,
+    newJobPostDetailSuccess,
+    newJobPostUpdateFailure,
+    newJobPostUpdateStart,
+    newJobPostUpdateSuccess
+} from '../redux/newJobPost/newJobPostSlice';
 
 const JobEditScreen = () => {
     const navigation = useNavigation();
@@ -127,7 +134,7 @@ const JobEditScreen = () => {
 
     return (
         <ScrollView style={styles.root} showsVerticalScrollIndicator={false}>
-            <KeyboardAvoidingView style={styles.keyboardView}>
+            <KeyboardAvoidingView style={styles.keyboardView} behavior="height" enabled>
                 <View style={{ marginTop: 50, gap: 15 }}>
                     <View>
                         <Text style={styles.label}>Title</Text>

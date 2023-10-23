@@ -103,10 +103,10 @@ const JobCreateScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView>
-                <ScrollView style={{ flex: 1, }} showsVerticalScrollIndicator={false}>
-                    <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 1 }}>
-                        <Text style={{ color: '#003580', fontSize: 20, fontWeight: '700' }}>Create JobPost</Text>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} enabled>
+                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                    <View style={styles.headerView}>
+                        <Text style={styles.headerText}>Create JobPost</Text>
                     </View>
 
                     <View style={{ marginTop: 50, gap: 15 }}>
@@ -263,6 +263,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
         fontSize: 18,
+        fontWeight: '700'
+    },
+    headerView: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 1
+    },
+    headerText: {
+        color: '#003580',
+        fontSize: 20,
         fontWeight: '700'
     }
 })

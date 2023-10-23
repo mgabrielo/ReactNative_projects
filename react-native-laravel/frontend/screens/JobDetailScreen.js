@@ -155,14 +155,14 @@ const JobDetailScreen = () => {
                         <Pressable style={[styles.button, { backgroundColor: '#003580', }]}
                             onPress={() => navigation.navigate('JobEdit', { id: id })}
                         >
-                            <Text style={{ textAlign: 'center', color: 'white', fontSize: 18, fontWeight: '700' }}>
+                            <Text style={styles.buttonText}>
                                 Update
                             </Text>
                         </Pressable>
                         <Pressable style={[styles.button, { backgroundColor: 'red', }]}
                             onPress={showDialog}
                         >
-                            <Text style={{ textAlign: 'center', color: 'white', fontSize: 18, fontWeight: '700' }}>
+                            <Text style={styles.buttonText}>
                                 Delete
                             </Text>
                         </Pressable>
@@ -232,5 +232,11 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         marginLeft: 'auto',
         marginRight: 'auto'
+    },
+    buttonText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '700'
     }
 })

@@ -15,7 +15,7 @@ const JobPostItem = ({ item }) => {
             navigation.navigate('Details', { id: item.id })
         }}>
             <View style={styles.root} >
-                <View style={{ flexDirection: 'column', marginVertical: 5, marginHorizontal: 10 }}>
+                <View style={styles.innerView}>
                     <View style={{ padding: 3, gap: 15 }}>
                         <Text style={styles.title}>{item?.title}</Text>
                         <Text style={styles.company}>{item?.company}</Text>
@@ -24,22 +24,20 @@ const JobPostItem = ({ item }) => {
                             displayType={'text'}
                             thousandSeparator={true}
                             prefix={'£'}
-                            renderText={formattedValue => <Text style={[styles.title, { color: '#003580', fontWeight: '600' }]} >{formattedValue}</Text>}
+                            renderText={formattedValue =>
+                                <Text style={styles.formattedView} >
+                                    {formattedValue}
+                                </Text>
+                            }
                         />
                         <Text style={styles.postedAt}>{outputDate}</Text>
                     </View>
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 15, }}>
-                        <Pressable style={{
-                            backgroundColor: '#003580',
-                            width: 300,
-                            padding: 5,
-                            borderRadius: 5,
-                            marginBottom: 2,
-                        }}
+                    <View style={styles.pressView}>
+                        <Pressable style={styles.pressable}
                             onPress={() => navigation.navigate('Details', { id: item.id })}
                         >
-                            <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'center' }}>
-                                <Text style={{ textAlign: 'center', color: 'white', fontSize: 18, fontWeight: '700' }}>
+                            <View style={styles.viewMoreView}>
+                                <Text style={styles.viewMoreText}>
                                     View More
                                 </Text>
                                 <Ionicons name="eye" size={24} color="#fff" />
@@ -72,9 +70,46 @@ const styles = StyleSheet.create({
     },
     postedAt: {
         fontSize: 15,
+        color: '#71797E'
     },
     company: {
         fontSize: 17,
         fontWeight: "400",
     },
+    pressable: {
+        backgroundColor: '#003580',
+        width: 300,
+        padding: 5,
+        borderRadius: 5,
+        marginBottom: 2,
+    },
+    innerView: {
+        flexDirection: 'column',
+        marginVertical: 5,
+        marginHorizontal: 10
+    },
+    pressView: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 15,
+    },
+    viewMoreText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '700'
+    },
+    viewMoreView: {
+        flexDirection: 'row',
+        gap: 10,
+        justifyContent: 'center'
+    },
+    formattedView: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginVertical: 2,
+        color: '#003580',
+        fontWeight: '600'
+    }
 })

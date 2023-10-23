@@ -81,32 +81,36 @@ const LoginScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} showsVerticalScrollIndicator={false}>
-                    <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                        <Text style={{ color: '#003580', fontSize: 18, fontWeight: '700' }}>Welcome to JobPost App</Text>
-                        <Text style={{ marginTop: 15, fontWeight: '500', fontSize: 15 }}>Sign In to Continue with Job Post App</Text>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior="height" enabled>
+                <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                    <View style={styles.headerView}>
+                        <Text style={styles.welcomeView}>
+                            Welcome to JobPost App
+                        </Text>
+                        <Text style={styles.continueView}>
+                            Sign In to Continue with Job Post App
+                        </Text>
                     </View>
-                    <View style={{ marginTop: 50, gap: 15 }}>
+                    <View style={styles.mainInputView}>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Email</Text>
+                            <Text style={styles.inputLabel}>Email</Text>
                             <TextInput
                                 placeholder='Enter your email'
                                 placeholderTextColor={'black'}
                                 value={formData.email}
                                 onChangeText={(text) => setFormData({ ...formData, email: text })}
-                                style={[styles.textinput, { fontSize: formData.email ? 15 : 17 }]}
+                                style={styles.textinput}
                             />
                         </View>
                         <View>
-                            <Text style={{ fontSize: 17, fontWeight: '600' }}>Password</Text>
+                            <Text style={styles.inputLabel}>Password</Text>
                             <TextInput
                                 secureTextEntry={true}
                                 placeholder='Enter your password'
                                 placeholderTextColor={'black'}
                                 value={formData.password}
                                 onChangeText={(text) => setFormData({ ...formData, password: text })}
-                                style={[styles.textinput, { fontSize: formData.password ? 15 : 17 }]}
+                                style={styles.textinput}
                             />
                         </View>
                     </View>
@@ -129,8 +133,13 @@ const LoginScreen = () => {
                         </Text>
                     </Pressable>
 
-                    <Pressable style={{ alignItems: 'center', marginVertical: 10 }} onPress={() => navigation.navigate('Register')}>
-                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#003580' }}>Don't Have An Account ? Sign Up</Text>
+                    <Pressable
+                        style={styles.registerPress}
+                        onPress={() => navigation.navigate('Register')}
+                    >
+                        <Text style={styles.registerRedirect}>
+                            Don't Have An Account ? Sign Up
+                        </Text>
                     </Pressable>
                     {
                         error && (
@@ -157,6 +166,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         paddingVertical: 5,
         width: 320,
+        fontSize: 17
     },
     buttonText: {
         textAlign: 'center',
@@ -178,5 +188,41 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 1,
         alignItems: 'center'
+    },
+    registerPress: {
+        alignItems: 'center',
+        marginVertical: 10
+    },
+    registerRedirect: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#003580'
+    },
+    welcomeView: {
+        color: '#003580',
+        fontSize: 18,
+        fontWeight: '700'
+    },
+    continueView: {
+        marginTop: 15,
+        fontWeight: '500',
+        fontSize: 15
+    },
+    headerView: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 50
+    },
+    inputLabel: {
+        fontSize: 17,
+        fontWeight: '600'
+    },
+    scrollView: {
+        flex: 1,
+        backgroundColor: '#fff'
+    },
+    mainInputView: {
+        marginTop: 50,
+        gap: 15
     }
 })
